@@ -1,0 +1,671 @@
+<title>Les week-ends de Marius</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout : bandeau "lac" en tête, sélecteur de week-ends en ruban défilant, agenda en cartes datées puis grille des lieux permanents */
+:root{
+  --bg:#EAF2F0; --surface:#FFFFFF; --surface-2:#F5F9F8; --ink:#14313A; --muted:#5B737A; --line:#D2E0DC;
+  --accent:#F4B400; --accent-ink:#3B2B00; --warn:#9A4A00; --warn-bg:#FDEBD3; --sky:#7FB8D6; --sun:#F4B400; --cloud:#B7C4C9; --lake:#1E6F7C; --lake-2:#2E8C93; --free:#1F8A57; --free-bg:#DDF2E6;
+  --c-spectacle:#D9544D; --c-lecture:#6A58D6; --c-musique:#8B4FC9; --c-atelier:#CF4C86; --c-fete:#E07B12;
+  --c-nature:#2F8F5E; --c-animaux:#B07A1F; --c-jeux:#2A7FC9; --c-musee:#7D5AB5; --c-piscine:#178F95; --c-marche:#A9502F;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --shadow:0 1px 2px rgba(20,49,58,.06), 0 6px 18px -8px rgba(20,49,58,.18);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1E22; --warn:#FFB869; --warn-bg:#3B2610; --sky:#3E6F86; --sun:#FFC629; --cloud:#5E7076; --surface:#16292E; --surface-2:#1B3238; --ink:#E6F0EE; --muted:#97AEB3; --line:#28434A;
+  --accent:#FFC629; --accent-ink:#2B2000; --lake:#5FB7C2; --lake-2:#7CC8CF; --free:#6FD39D; --free-bg:#173A2A;
+  --c-spectacle:#F27B74; --c-lecture:#9C8CF5; --c-musique:#B784EC; --c-atelier:#F07AAE; --c-fete:#F6A04A;
+  --c-nature:#5FC28C; --c-animaux:#DDA650; --c-jeux:#6BB2F0; --c-musee:#AE8FE0; --c-piscine:#4DC6CB; --c-marche:#DA845F;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 20px -10px rgba(0,0,0,.6); color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0F1E22; --warn:#FFB869; --warn-bg:#3B2610; --sky:#3E6F86; --sun:#FFC629; --cloud:#5E7076; --surface:#16292E; --surface-2:#1B3238; --ink:#E6F0EE; --muted:#97AEB3; --line:#28434A;
+  --accent:#FFC629; --accent-ink:#2B2000; --lake:#5FB7C2; --lake-2:#7CC8CF; --free:#6FD39D; --free-bg:#173A2A;
+  --c-spectacle:#F27B74; --c-lecture:#9C8CF5; --c-musique:#B784EC; --c-atelier:#F07AAE; --c-fete:#F6A04A;
+  --c-nature:#5FC28C; --c-animaux:#DDA650; --c-jeux:#6BB2F0; --c-musee:#AE8FE0; --c-piscine:#4DC6CB; --c-marche:#DA845F;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 20px -10px rgba(0,0,0,.6); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font-family:var(--body); font-size:16px; line-height:1.5; margin:0}
+.wrap{max-width:1080px; margin:0 auto; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px))}
+h1,h2,h3{font-family:var(--display); text-wrap:balance; margin:0; letter-spacing:-.01em}
+a{color:var(--lake)}
+button{font:inherit; color:inherit}
+:focus-visible{outline:3px solid var(--accent); outline-offset:2px; border-radius:8px}
+
+/* En-tête */
+.hero{position:relative; overflow:hidden; background:var(--lake); color:#fff}
+.hero .wrap{padding-block:28px 34px; position:relative; z-index:1; display:grid; gap:14px}
+.eyebrow{font-size:.78rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; opacity:.85}
+.hero h1{font-size:clamp(2rem, 6vw, 3.4rem); font-weight:800; line-height:1.02}
+.hero h1 em{font-style:normal; color:var(--accent)}
+.hero p{margin:0; max-width:58ch; opacity:.92}
+.ripples{position:absolute; inset:auto -10% -40px auto; width:520px; max-width:90%; opacity:.18; pointer-events:none}
+.meta-row{display:flex; flex-wrap:wrap; gap:10px; align-items:center; font-size:.9rem}
+.stamp{background:rgba(255,255,255,.14); border-radius:999px; padding:6px 12px}
+.btn{border:0; border-radius:999px; padding:9px 16px; font-weight:700; cursor:pointer; display:inline-flex; gap:8px; align-items:center}
+.btn-accent{background:var(--accent); color:var(--accent-ink)}
+.btn-ghost{background:rgba(255,255,255,.16); color:#fff}
+.btn:disabled{opacity:.6; cursor:progress}
+.btn svg{width:16px; height:16px}
+
+/* Barre de filtres */
+.bar{position:sticky; top:env(safe-area-inset-top, 0px); z-index:5; background:var(--bg); border-bottom:1px solid var(--line)}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:10; background:var(--lake)}
+.bar .wrap{padding-block:8px; display:flex; gap:10px; align-items:center}
+.bar .modes{flex:0 0 auto}
+.bar .scroller{flex:1 1 auto; min-width:0}
+@media (max-width:640px){ .bar .wrap{display:grid; gap:6px} .mode{padding:5px 12px; font-size:.84rem} }
+.wk{padding:5px 10px !important}
+.tools{display:grid; gap:10px; margin-bottom:-14px}
+.filters{background:var(--surface); border:1.5px solid var(--line); border-radius:16px}
+.filters summary{list-style:none; cursor:pointer; padding:10px 14px; display:flex; gap:10px; align-items:center; font-weight:700}
+.filters summary::-webkit-details-marker{display:none}
+.filters summary::after{content:"▾"; margin-left:auto; color:var(--muted)}
+.filters[open] summary::after{content:"▴"}
+.filters summary b{background:var(--accent); color:var(--accent-ink); border-radius:999px; font-size:.75rem; padding:1px 8px}
+.filters summary small{color:var(--muted); font-weight:400; font-size:.84rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0}
+.fbody{padding:0 14px 14px; display:grid; gap:10px}
+.reset{justify-self:start; border:0; background:none; color:var(--lake); font-weight:700; cursor:pointer; padding:0}
+.scroller{display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px}
+.scroller::-webkit-scrollbar{display:none}
+.wk{flex:0 0 auto; border:1.5px solid var(--line); background:var(--surface); border-radius:14px; padding:7px 12px; cursor:pointer; text-align:left; line-height:1.2}
+.wk b{display:block; font-family:var(--display); font-size:.98rem}
+.wk small{color:var(--muted); font-size:.75rem}
+.wk[aria-pressed="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.wk[aria-pressed="true"] small{color:inherit; opacity:.75}
+.wk .n{display:inline-block; min-width:1.5em; text-align:center; background:var(--accent); color:var(--accent-ink); border-radius:999px; font-size:.7rem; font-weight:700; margin-left:6px; padding:0 6px}
+.modes{display:flex; gap:4px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:3px; justify-self:start; max-width:100%}
+.mode{border:0; background:transparent; border-radius:999px; padding:6px 14px; font-weight:700; font-size:.9rem; cursor:pointer; white-space:nowrap}
+.mode[aria-pressed="true"]{background:var(--accent); color:var(--accent-ink)}
+.chips-lab{font-size:.78rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; align-self:center; margin-right:2px}
+.chips{display:flex; gap:6px; flex-wrap:wrap}
+.chip{border:1.5px solid var(--line); background:var(--surface); border-radius:999px; padding:5px 12px; font-size:.86rem; cursor:pointer; display:inline-flex; align-items:center; gap:6px}
+.chip .dot{width:9px; height:9px; border-radius:50%; background:var(--c)}
+.chip[aria-pressed="true"]{border-color:var(--ink); background:var(--ink); color:var(--bg)}
+
+/* Sections */
+main .wrap{padding-block:24px 56px; display:grid; gap:40px}
+.sec-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:14px}
+.sec-head h2{font-size:clamp(1.4rem, 3.6vw, 1.9rem); font-weight:800}
+.sec-head .count{color:var(--muted); font-size:.92rem}
+.town{display:grid; gap:4px}
+.town + .town{margin-top:26px}
+.town-h{font-family:var(--display); font-size:1.15rem; font-weight:800; display:flex; gap:10px; align-items:center; padding-bottom:6px; border-bottom:2px solid var(--ink)}
+.town.around .town-h{border-bottom-color:var(--line); color:var(--muted)}
+.town-h span{font-family:var(--body); font-size:.78rem; font-weight:700; background:var(--accent); color:var(--accent-ink); border-radius:999px; padding:1px 8px}
+.day-label{font-family:var(--display); font-weight:700; font-size:1.05rem; margin:18px 0 10px; display:flex; gap:10px; align-items:center}
+.day-label::after{content:""; flex:1; height:1px; background:var(--line)}
+.grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr))}
+@media (max-width:420px){.grid{grid-template-columns:1fr}}
+
+.card{background:var(--surface); border-radius:18px; box-shadow:var(--shadow); display:grid; position:relative; min-width:0; overflow:hidden}
+.media{position:relative; aspect-ratio:16/9; max-width:100%; background:var(--surface-2)}
+.slides{display:flex; overflow-x:auto; scroll-snap-type:x mandatory; height:100%; scrollbar-width:none}
+.slides::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%; scroll-snap-align:start; height:100%; position:relative}
+.slide img{width:100%; height:100%; object-fit:cover; display:block}
+.slide svg.scene{width:100%; height:100%; display:block}
+.slide.fit{overflow:hidden; background:#111}
+.slide.fit img.bg{position:absolute; inset:-20px; width:calc(100% + 40px); height:calc(100% + 40px); object-fit:cover; filter:blur(18px) brightness(.7)}
+.slide.fit img.fg{position:relative; object-fit:contain}
+.ptag{display:inline-block; font-weight:700; font-size:.6rem; letter-spacing:.02em; border-radius:999px; padding:2px 7px; margin-right:6px; text-shadow:none; vertical-align:1px}
+.ptag.officiel{background:#fff; color:#1d5b3a}
+.ptag.lieu{background:rgba(255,255,255,.85); color:#3a3a3a}
+.ptag.illustration{background:#ffe08a; color:#5a4300}
+.credit{position:absolute; left:8px; right:8px; top:8px; font-size:.62rem; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.8); text-decoration:none; opacity:.8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding-right:36px}
+.dots{position:absolute; bottom:8px; left:0; right:0; display:flex; justify-content:center; gap:5px; pointer-events:none}
+.dots i{width:6px; height:6px; border-radius:50%; background:rgba(255,255,255,.55)}
+.dots i.on{background:#fff; width:16px; border-radius:3px}
+.media .tile{position:absolute; left:12px; bottom:12px; box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.media .addph{position:absolute; right:10px; bottom:10px; border:0; border-radius:999px; background:rgba(0,0,0,.45); color:#fff; font-size:.75rem; padding:5px 10px; cursor:pointer}
+.inner{padding:14px; display:grid; gap:6px; min-width:0}
+.meteo-tip{font-size:.84rem; border-radius:10px; padding:7px 10px; display:flex; gap:8px; align-items:flex-start; background:var(--surface-2)}
+.meteo-tip svg{flex:0 0 20px; margin-top:0}
+.meteo-tip.good{background:var(--free-bg); color:var(--free)}
+.meteo-tip.warn{background:var(--warn-bg); color:var(--warn)}
+.trips{display:grid; gap:3px; font-size:.84rem; color:var(--muted); font-variant-numeric:tabular-nums}
+.trips div{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.trips b{color:var(--ink); min-width:62px; font-weight:700}
+.trips span{display:inline-flex; gap:4px; align-items:center}
+.trips svg{width:15px; height:15px}
+.trips .primary b{color:var(--lake)}
+.links{display:flex; gap:14px; flex-wrap:wrap; margin-top:2px}
+.wx{display:flex; gap:8px; overflow-x:auto; scrollbar-width:none}
+.wxd{flex:0 0 auto; display:grid; gap:6px; background:var(--surface); border:1.5px solid var(--line); border-radius:16px; padding:8px 12px; font-size:.85rem}
+.wxh{display:flex; gap:8px; align-items:baseline; flex-wrap:wrap}
+.wxh b{font-family:var(--display)}
+.wxd small{color:var(--muted)}
+.wxp{display:flex; gap:14px; align-items:center}
+.wxp > div{display:grid; justify-items:center; gap:2px}
+.wxp span{font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:700}
+.wxp b{font-family:var(--display); font-size:1.05rem; font-variant-numeric:tabular-nums}
+.wxna{font-size:.75rem; color:var(--muted); max-width:16ch; line-height:1.25}
+.hours{width:100%; border-collapse:collapse; font-size:.82rem; font-variant-numeric:tabular-nums}
+.hours td{padding:2px 0; border-bottom:1px dashed var(--line); vertical-align:top}
+.hours td:first-child{color:var(--muted); width:3.2em; font-weight:700}
+.hours tr.today td{color:var(--ink); font-weight:700}
+.hours tr.today td:first-child{color:var(--lake)}
+.hours tr.closed td:last-child{color:var(--muted)}
+.hrs-note{font-size:.76rem; color:var(--muted)}
+details.det{border-top:1px solid var(--line); border-bottom:1px solid var(--line); margin:2px 0}
+details.det summary{cursor:pointer; list-style:none; display:flex; align-items:center; justify-content:space-between; gap:8px; padding:9px 0; font-size:.88rem; font-weight:700; color:var(--lake)}
+details.det summary::-webkit-details-marker{display:none}
+details.det summary svg{width:18px; height:18px; flex:0 0 18px; transition:transform .2s}
+details.det[open] summary svg{transform:rotate(180deg)}
+.det-in{display:grid; gap:8px; padding:0 0 12px; font-size:.86rem; line-height:1.45}
+.det-res{margin:0}
+.det-h{font-size:.7rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:4px}
+.prog{list-style:none; margin:0; padding:0; display:grid; gap:0}
+.prog li{display:grid; grid-template-columns:4.6em 1fr; gap:10px; padding:6px 0; border-bottom:1px dashed var(--line); font-variant-numeric:tabular-nums}
+.prog li:last-child{border-bottom:0}
+.prog b{color:var(--c)}
+.det-l{margin:0; padding-left:1.1em; display:grid; gap:3px}
+.det-src{font-size:.76rem; color:var(--muted)}
+details.hw summary{cursor:pointer; font-size:.84rem; font-weight:700; color:var(--lake); list-style:none}
+details.hw summary::-webkit-details-marker{display:none}
+.when{display:flex; gap:6px; align-items:flex-start; font-size:.88rem; font-weight:700}
+.when svg{flex:0 0 16px; width:16px; height:16px; margin-top:2px; color:var(--lake)}
+.tile{width:58px; z-index:1; border-radius:14px; background:var(--c); color:#fff; display:grid; place-items:center; align-content:center; padding:8px 4px; text-align:center; line-height:1.05; align-self:start}
+.tile .d{font-family:var(--display); font-weight:800; font-size:1.55rem}
+.tile .m{font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; font-weight:700}
+.tile .w{font-size:.66rem; opacity:.9}
+.tile svg{width:28px; height:28px}
+.body{min-width:0; display:grid; gap:6px; align-content:start}
+.cat{font-size:.72rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--c)}
+.card h3{font-size:1.08rem; font-weight:700; line-height:1.2}
+.where{color:var(--muted); font-size:.88rem}
+.desc{font-size:.92rem; margin:0}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:2px}
+.tag{font-size:.76rem; border-radius:999px; padding:3px 9px; background:var(--surface-2); border:1px solid var(--line); white-space:nowrap}
+.tag.pert{font-weight:700; border-color:transparent}
+.tag.pert.top{background:var(--free-bg); color:var(--free)}
+.tag.pert.ok{background:var(--surface-2); color:var(--lake)}
+.tag.pert.bad{background:var(--warn-bg); color:var(--warn)}
+.tag.free{background:var(--free-bg); color:var(--free); border-color:transparent; font-weight:700}
+.tag.price{font-variant-numeric:tabular-nums}
+.more{font-size:.86rem; font-weight:700; text-decoration:none; justify-self:start}
+.more:hover{text-decoration:underline}
+.fav{position:absolute; top:10px; right:10px; width:34px; height:34px; border-radius:50%; border:0; background:var(--surface); box-shadow:var(--shadow); z-index:2; cursor:pointer; display:grid; place-items:center; color:var(--muted)}
+.fav svg{width:20px; height:20px}
+.fav[aria-pressed="true"]{color:var(--c-spectacle)}
+.fav[aria-pressed="true"] path{fill:currentColor}
+
+.empty{background:var(--surface); border:2px dashed var(--line); border-radius:18px; padding:22px; color:var(--muted); display:grid; gap:6px}
+.empty b{color:var(--ink); font-family:var(--display); font-size:1.1rem}
+.note{font-size:.82rem; color:var(--muted); max-width:70ch}
+.toast{position:fixed; left:50%; transform:translateX(-50%); bottom:calc(18px + env(safe-area-inset-bottom, 0px)); background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:12px; font-size:.9rem; box-shadow:var(--shadow); z-index:20; max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion: no-preference){ .card{transition:transform .15s ease} .card:hover{transform:translateY(-2px)} }
+</style>
+
+<header class="hero">
+  <svg class="ripples" viewBox="0 0 400 200" aria-hidden="true"><g fill="none" stroke="#fff" stroke-width="2.5">
+    <ellipse cx="260" cy="150" rx="40" ry="12"/><ellipse cx="260" cy="150" rx="90" ry="28"/><ellipse cx="260" cy="150" rx="150" ry="48"/><ellipse cx="260" cy="150" rx="215" ry="70"/></g></svg>
+  <div class="wrap">
+    <div class="eyebrow">Enghien-les-Bains · Ermont · Vallée de Montmorency</div>
+    <h1>Les week-ends de <em>Marius</em></h1>
+    <p>Spectacles pour tout-petits, comptines en médiathèque, parcs, fermes et coins au chaud, à moins de 25 km. Le week-end depuis la maison, le mercredi depuis Ermont. Gratuit ou payant, tout est là.</p>
+    <div class="meta-row">
+      <span class="stamp" id="stamp">Chargement des sorties…</span>
+      <button class="btn btn-accent" id="refresh" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/></svg>Rafraîchir</button>
+      <button class="btn btn-ghost" id="relaunch" type="button" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>Relancer la recherche</button>
+    </div>
+  </div>
+</header>
+
+<nav class="bar" aria-label="Filtres">
+  <div class="wrap">
+    <div class="modes" id="modes" role="group" aria-label="Quel jour"><button class="mode" type="button" data-mode="we" aria-pressed="true">Les week-ends</button><button class="mode" type="button" data-mode="mer" aria-pressed="false">Les mercredis à Ermont</button></div>
+    <div class="scroller" id="weekends" role="group" aria-label="Choisir un week-end"></div>
+  </div>
+</nav>
+
+<main>
+  <div class="wrap">
+    <div class="tools">
+      <div class="wx" id="wx" aria-label="Météo"></div>
+      <details class="filters" id="filters">
+        <summary><span>Filtres</span><b id="fcount" hidden></b><small id="fsum"></small></summary>
+        <div class="fbody">
+          <div class="chips" id="near" role="group" aria-label="Proximité"></div>
+          <div class="chips" id="chips" role="group" aria-label="Filtrer"></div>
+          <button class="reset" id="freset" type="button" hidden>Tout effacer</button>
+        </div>
+      </details>
+    </div>
+    <section aria-labelledby="h-agenda">
+      <div class="sec-head"><h2 id="h-agenda">Au programme</h2><span class="count" id="agenda-count"></span></div>
+      <div id="agenda"></div>
+    </section>
+    <section aria-labelledby="h-lieux">
+      <div class="sec-head"><h2 id="h-lieux">Les valeurs sûres, tous les week-ends</h2><span class="count" id="lieux-count"></span></div>
+      <div id="lieux"></div>
+    </section>
+    <p class="note">Les dates, horaires et tarifs sont relevés sur les sites des villes, médiathèques et lieux. Ils peuvent changer : vérifiez sur la page du lieu avant de partir, surtout pour les spectacles où la réservation est souvent obligatoire.</p>
+  </div>
+</main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+  const CATS = {
+    spectacle:{l:"Spectacle", c:"--c-spectacle"}, lecture:{l:"Histoires & comptines", c:"--c-lecture"},
+    musique:{l:"Musique", c:"--c-musique"}, atelier:{l:"Atelier", c:"--c-atelier"}, fete:{l:"Fête & marché de Noël", c:"--c-fete"},
+    nature:{l:"Nature & parc", c:"--c-nature"}, animaux:{l:"Animaux", c:"--c-animaux"}, jeux:{l:"Jeux", c:"--c-jeux"},
+    musee:{l:"Musée", c:"--c-musee"}, piscine:{l:"Piscine", c:"--c-piscine"}, marche:{l:"Marché", c:"--c-marche"}
+  };
+  const ICONS = {
+    nature:'<path d="M12 3 5 13h4l-3 5h12l-3-5h4z"/><path d="M12 18v3"/>',
+    animaux:'<circle cx="8" cy="7" r="2"/><circle cx="16" cy="7" r="2"/><circle cx="5" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/><path d="M12 11c-3 0-5 4-5 6s2 2 5 2 5 0 5-2-2-6-5-6z"/>',
+    jeux:'<rect x="3" y="8" width="18" height="10" rx="4"/><path d="M8 11v4M6 13h4"/><circle cx="16" cy="12" r="1"/><circle cx="18" cy="14" r="1"/>',
+    piscine:'<path d="M2 16c2 0 2-1.5 4-1.5S8 16 10 16s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><path d="M2 20c2 0 2-1.5 4-1.5S8 20 10 20s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><circle cx="12" cy="7" r="3"/>',
+    musee:'<path d="M3 10 12 4l9 6"/><path d="M5 10v8M9 10v8M15 10v8M19 10v8M3 20h18"/>',
+    lecture:'<path d="M3 6c3-1 6-1 9 1v12c-3-2-6-2-9-1z"/><path d="M21 6c-3-1-6-1-9 1v12c3-2 6-2 9-1z"/>',
+    atelier:'<path d="M14 4l6 6-9 9H5v-6z"/>',
+    spectacle:'<path d="M4 5h16v6a8 8 0 0 1-16 0z"/><path d="M9 10h.01M15 10h.01M9 14c1.5 1.5 4.5 1.5 6 0"/>',
+    musique:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+    fete:'<path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/>',
+    marche:'<path d="M3 9h18l-2 11H5z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/>'
+  };
+  const MONTHS = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+  const DAYS = ["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
+  const DAYS_LONG = ["Dimanche","Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi"];
+
+  const state = { items:[], meta:null, meteo:null, near:null, sortNear:false, mode:'we', weekend:0, filters:new Set(), favs:new Set(), ready:false };
+  try{ (JSON.parse(localStorage.getItem("marius-favs")||"[]")).forEach(f=>state.favs.add(f)); }catch(e){}
+  try{ const m=localStorage.getItem("marius-mode"); if(m==="mer") state.mode="mer"; }catch(e){}
+
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const parse = s => { if(!s) return null; const [y,m,d]=String(s).slice(0,10).split("-").map(Number); return new Date(y,m-1,d); };
+  const today = (()=>{ const t=new Date(); return new Date(t.getFullYear(), t.getMonth(), t.getDate()); })();
+  const addDays = (d,n)=>new Date(d.getFullYear(), d.getMonth(), d.getDate()+n);
+  const fmtShort = d => d.getDate()+" "+MONTHS[d.getMonth()];
+
+  // Week-ends à venir (samedi + dimanche)
+  function weekends(){
+    const list=[]; let sat = addDays(today, (6 - today.getDay() + 7) % 7);
+    if(today.getDay()===0) sat = addDays(today,-1);
+    for(let i=0;i<10;i++){ const s=addDays(sat,i*7); list.push({sat:s, sun:addDays(s,1)}); }
+    return list;
+  }
+  const WKS = weekends();
+  function wednesdays(){ const list=[]; const first = addDays(today, (3 - today.getDay() + 7) % 7); for(let i=0;i<10;i++){ const d=addDays(first,i*7); list.push({sat:d, sun:d}); } return list; }
+  const WEDS = wednesdays();
+  const slots = () => state.mode==="mer" ? WEDS : WKS;
+  const isMer = () => state.mode==="mer";
+  function hasWed(it){ const s=parse(it.date_debut), e=parse(it.date_fin)||s; if(!s) return false; for(let d=s; d<=e; d=addDays(d,1)){ if(d.getDay()===3) return true; if((d-s)>6*864e5) return true; } return false; }
+  const dist = it => isMer() ? (it.distance_ermont_km ?? it.distance_km) : it.distance_km;
+
+  function toast(msg){ const t=$("toast"); t.textContent=msg; t.hidden=false; clearTimeout(toast._t); toast._t=setTimeout(()=>t.hidden=true, 3800); }
+
+  function overlaps(it, a, b){
+    const s=parse(it.date_debut), e=parse(it.date_fin)||s; if(!s) return false;
+    return s<=b && e>=a;
+  }
+  function passes(it){
+    for(const f of state.filters){
+      if(f==="gratuit" && !it.gratuit) return false;
+      if(f==="chaud" && it.interieur!==true) return false;
+      if(f==="favs" && !state.favs.has(it._id)) return false;
+      if(f.startsWith("cat:") && it.categorie!==f.slice(4)) return false;
+      if(f==="meteo"){ const r=rank(it); if(!(r.meteo>=1) || r.closed) return false; }
+    }
+    if(state.near){ const t=it.trajet && (isMer()?it.trajet.ermont:it.trajet.maison); if(!t) return false;
+      if(state.near==="pied" && !(t.pied!=null && t.pied<=20)) return false;
+      if(state.near==="v10" && !(t.voiture<=10)) return false;
+      if(state.near==="v20" && !(t.voiture<=20)) return false; }
+    return true;
+  }
+  function counts(){ return slots().map(w=>state.items.filter(i=>i.type==="evenement" && overlaps(i,w.sat,w.sun) && passes(i)).length); }
+
+  function renderWeekends(){
+    document.querySelectorAll("#modes .mode").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.mode===state.mode)));
+    const n = counts(); const S = slots();
+    const all = state.items.filter(i=>i.type==="evenement" && (parse(i.date_fin)||parse(i.date_debut))>=today && (!isMer()||hasWed(i)) && passes(i)).length;
+    const btns = S.map((w,i)=>{
+      let lab, sub;
+      if(isMer()){ lab = i===0 ? (w.sat.getTime()===today.getTime() ? "Aujourd'hui" : "Mercredi") : (i===1 ? "Le suivant" : "Mer. "+w.sat.getDate()); sub = fmtShort(w.sat); }
+      else { lab = i===0 ? "Ce week-end" : (i===1 ? "Le suivant" : "Sam. "+w.sat.getDate()+" "+MONTHS[w.sat.getMonth()]); sub = w.sat.getDate()+"–"+fmtShort(w.sun); }
+      return `<button class="wk" type="button" data-wk="${i}" aria-pressed="${state.weekend===i}"><b>${lab}${n[i]?`<span class="n">${n[i]}</span>`:""}</b><small>${sub}</small></button>`;
+    }).join("");
+    $("weekends").setAttribute("aria-label", isMer() ? "Choisir un mercredi" : "Choisir un week-end");
+    $("weekends").innerHTML = btns + `<button class="wk" type="button" data-wk="-1" aria-pressed="${state.weekend===-1}"><b>${isMer()?"Tous les mercredis":"Tout l'agenda"}${all?`<span class="n">${all}</span>`:""}</b><small>${isMer()?"d'ici fin janvier":"semaine comprise"}</small></button>`;
+  }
+
+  function renderFsum(){
+    const labels=[...document.querySelectorAll('#filters [aria-pressed="true"]')].map(b=>b.textContent.trim());
+    const n=labels.length; $("fcount").hidden=!n; $("fcount").textContent=n; $("fsum").textContent = n ? labels.join(", ") : "Proximité, météo, gratuit, catégories";
+    $("freset").hidden=!n;
+  }
+  function renderChips(){
+    const present = new Set(state.items.map(i=>i.categorie));
+    const base = [["meteo","Idéal avec cette météo",null],["gratuit","Gratuit",null],["chaud","Au chaud",null],["favs","Mes favoris",null]];
+    const from = isMer() ? "d'Ermont" : "de la maison";
+    const N=[["pied","À pied, 20 min max"],["v10","10 min en voiture"],["v20","20 min en voiture"]];
+    $("near").innerHTML = `<span class="chips-lab">Près ${from}</span>` + N.map(([k,l])=>`<button class="chip" type="button" data-near="${k}" aria-pressed="${state.near===k}">${esc(l)}</button>`).join("");
+    const cats = Object.keys(CATS).filter(k=>present.has(k)).map(k=>["cat:"+k, CATS[k].l, CATS[k].c]);
+    $("chips").innerHTML = [...base, ...cats].map(([k,l,c])=>`<button class="chip" type="button" data-f="${k}" aria-pressed="${state.filters.has(k)}"${c?` style="--c:var(${c})"`:""}>${c?'<span class="dot"></span>':""}${esc(l)}</button>`).join("");
+  }
+
+  function tags(it){
+    const t=[];
+    if(it.type==="lieu" && slotDays().some(wxOf)){ const r=rank(it);
+      if(r.closed) t.push('<span class="tag pert bad">Fermé ce jour-là</span>');
+      else if(r.meteo>=3) t.push('<span class="tag pert top">Idéal avec cette météo</span>');
+      else if(r.meteo>=1) t.push('<span class="tag pert ok">Bon choix avec cette météo</span>');
+      else if(r.meteo<=-2) t.push('<span class="tag pert bad">Pas top avec cette météo</span>'); }
+    t.push(it.gratuit ? '<span class="tag free">Gratuit</span>' : `<span class="tag price">${esc(it.prix_label||"Payant")}</span>`);
+    if(it.interieur===true) t.push('<span class="tag">Au chaud</span>'); else if(it.interieur===false) t.push('<span class="tag">Dehors</span>');
+    if(isMer() && it.type==="lieu" && it.ouvert_mercredi==null) t.push('<span class="tag">Mercredi : à vérifier</span>');
+    if(it.age_min_mois!=null) t.push(`<span class="tag">Dès ${it.age_min_mois>=24 ? Math.round(it.age_min_mois/12)+" ans" : it.age_min_mois+" mois"}</span>`);
+    if(it.reservation===true) t.push('<span class="tag">Sur réservation</span>');
+    return t.join("");
+  }
+  // --- Météo
+  const WXI = {
+    soleil:'<defs><radialGradient id="gs" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE27A"/><stop offset="1" stop-color="#F6A800"/></radialGradient></defs><g stroke="#F6B400" stroke-width="2.2" stroke-linecap="round"><path d="M24 4v5M24 39v5M4 24h5M39 24h5M9.9 9.9l3.5 3.5M34.6 34.6l3.5 3.5M9.9 38.1l3.5-3.5M34.6 13.4l3.5-3.5"/></g><circle cx="24" cy="24" r="9" fill="url(#gs)"/>',
+    eclaircies:'<defs><radialGradient id="ge" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#FFE27A"/><stop offset="1" stop-color="#F6A800"/></radialGradient><linearGradient id="ce" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#D5DEE2"/></linearGradient></defs><g stroke="#F6B400" stroke-width="2" stroke-linecap="round"><path d="M18 4v4M6 16h4M9.5 7.5l2.8 2.8M26.5 7.5l-2.8 2.8"/></g><circle cx="18" cy="17" r="7" fill="url(#ge)"/><path d="M14 38h22a8 8 0 0 0 0-16 10.5 10.5 0 0 0-20 3 6.5 6.5 0 0 0-2 13z" fill="url(#ce)" stroke="#AEBCC2" stroke-width="1.2"/>',
+    nuageux:'<defs><linearGradient id="cn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9EEF0"/><stop offset="1" stop-color="#B5C2C8"/></linearGradient></defs><path d="M20 20a8 8 0 0 1 15-1 6 6 0 0 1 2 11" fill="#C9D3D7"/><path d="M11 38h21a8 8 0 0 0 0-16 10.5 10.5 0 0 0-20 3 6.5 6.5 0 0 0-1 13z" fill="url(#cn)" stroke="#98A8AF" stroke-width="1.2"/>',
+    pluie:'<defs><linearGradient id="cp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCE3E6"/><stop offset="1" stop-color="#9AAAB1"/></linearGradient></defs><path d="M11 30h21a8 8 0 0 0 0-16 10.5 10.5 0 0 0-20 3 6.5 6.5 0 0 0-1 13z" fill="url(#cp)" stroke="#82959D" stroke-width="1.2"/><g stroke="#3D8FD6" stroke-width="2.6" stroke-linecap="round"><path d="M16 35l-2 6M24 35l-2 6M32 35l-2 6"/></g>'
+  };
+  const wxSvg = (c, size) => `<svg viewBox="0 0 48 48" width="${size}" height="${size}" aria-label="${({soleil:"Soleil",eclaircies:"Éclaircies",nuageux:"Nuageux",pluie:"Pluie"})[c]||"Nuageux"}">${WXI[c]||WXI.nuageux}</svg>`;
+  const iso = d => d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  function wxOf(d){ const j=state.meteo && state.meteo.jours; if(!j) return null; return j.find(x=>x.date===iso(d))||null; }
+  const rainy = w => w && (w.ciel==="pluie" || (w.pluie_pct||0)>=50);
+  const cold = w => w && w.tmax!=null && w.tmax<8;
+  function slotDays(){ if(state.weekend===-1) return []; const w=slots()[state.weekend]; return isMer()?[w.sat]:[w.sat,w.sun]; }
+  function itemDays(it){
+    const days=slotDays();
+    if(it.type==="evenement"){ const s0=parse(it.date_debut), e0=parse(it.date_fin)||s0; if(!s0) return [];
+      const ds = days.length ? days.filter(d=>d>=s0&&d<=e0) : (s0>=today?[s0]:[]); return ds; }
+    return days;
+  }
+  // Score météo : pertinence du lieu selon pluie, température et ciel des jours choisis
+  function wxScore(it, w){
+    const inside = it.interieur===true; let sc=0;
+    if(rainy(w)) sc += inside ? 3 : -3;
+    else if(w.ciel==="soleil"||w.ciel==="eclaircies") sc += inside ? -1 : (w.tmax>=10 ? 2 : 1);
+    if(w.tmax!=null){ if(w.tmax<5) sc += inside?2:-2; else if(w.tmax<9) sc += inside?1:-1; else if(w.tmax>=16 && !rainy(w)) sc += inside?-1:1; }
+    return sc;
+  }
+  function closedOn(it, days){
+    const hs=it.horaires_semaine; if(!hs||!days.length) return false;
+    return days.every(d=>{ const v=hs[JK[d.getDay()]]; return v && /^ferm/i.test(v); });
+  }
+  function rank(it){
+    const days = it.type==="evenement" ? itemDays(it) : slotDays(); const ws=days.map(wxOf).filter(Boolean);
+    const meteo = ws.length ? Math.max(...ws.map(w=>wxScore(it,w))) : 0;
+    const closed = it.type==="lieu" && closedOn(it, days);
+    const d = dist(it) ?? 15;
+    return {meteo, closed, total: meteo*2 - d/6 - (closed?50:0)};
+  }
+  function advice(it){
+    const ws=itemDays(it).map(wxOf).filter(Boolean); if(!ws.length) return null;
+    const anyRain=ws.some(rainy), allRain=ws.every(rainy), w=ws.find(rainy)||ws[0];
+    const pct = w.pluie_pct ? ` (${w.pluie_pct} %)` : "";
+    if(it.interieur===true){
+      if(anyRain) return {k:"good", ic:"pluie", t:`Au sec : pile ce qu'il faut avec la pluie annoncée${pct}.`};
+      if(ws.every(x=>x.ciel==="soleil")) return {k:"", ic:"soleil", t:`Grand beau prévu (${w.tmax}°) : à garder pour un jour de pluie, ou à combiner avec un parc.`};
+      return null;
+    }
+    if(allRain) return {k:"warn", ic:"pluie", t:`Pluie annoncée${pct} : bottes et k-way, ou gardez ça pour un autre jour.`};
+    if(anyRain) return {k:"warn", ic:"pluie", t:`Un des deux jours s'annonce pluvieux : visez le plus sec.`};
+    if(ws.some(cold)) return {k:"warn", ic:"nuageux", t:`Ça caille (max ${Math.min(...ws.map(x=>x.tmax))}°) : bonnet, gants et couverture de poussette.`};
+    if(ws.some(x=>x.ciel==="soleil"||x.ciel==="eclaircies")) return {k:"good", ic:"soleil", t:`Temps sec prévu (${w.tmax}°) : idéal pour en profiter dehors.`};
+    return {k:"", ic:"nuageux", t:`Ciel gris mais sec (${w.tmax}°) : ça passe très bien.`};
+  }
+  function renderWx(){
+    const days = slotDays(); const el=$("wx");
+    if(!days.length || !state.meteo){ el.innerHTML=""; el.hidden=true; return; }
+    el.hidden=false;
+    const P=[["matin","Matin"],["midi","Midi"],["soir","Soir"]];
+    el.innerHTML = days.map(d=>{ const w=wxOf(d);
+      const head=`<div class="wxh"><b>${DAYS_LONG[d.getDay()]} ${d.getDate()}</b>${w?`<small>${esc(w.resume||"")}${w.pluie_pct!=null?` · pluie ${w.pluie_pct} %`:""}</small>`:""}</div>`;
+      if(!w) return `<div class="wxd">${head}<small class="wxna">Prévisions pas encore disponibles</small></div>`;
+      const per = w.periodes;
+      const body = per ? `<div class="wxp">${P.map(([k,l])=>{ const x=per[k]; return x?`<div><span>${l}</span>${wxSvg(x.ciel,34)}<b>${x.t}°</b></div>`:""; }).join("")}</div>`
+        : `<div class="wxp"><div><span>Journée</span>${wxSvg(w.ciel,34)}<b>${w.tmin}° / ${w.tmax}°</b></div><div class="wxna">Matin, midi, soir : précisés 2 jours avant</div></div>`;
+      return `<div class="wxd">${head}${body}</div>`; }).join("");
+  }
+
+  // --- Illustration de couverture
+  function hash(str){ let h=0; for(const c of String(str)) h=(h*31+c.charCodeAt(0))|0; return Math.abs(h); }
+  function scene(it){
+    const h=hash(it._id), cv=`var(${(CATS[it.categorie]||CATS.jeux).c})`;
+    let blobs=""; for(let i=0;i<5;i++){ const x=(h>>(i*3))%320, y=(h>>(i*2+1))%180, r=18+((h>>i)%40); blobs+=`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" opacity="${0.07+((h>>i)%5)/50}"/>`; }
+    return `<svg class="scene" viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="320" height="180" fill="${cv}"/>${blobs}
+      <path d="M0 150 Q80 ${120+h%20} 160 145 T320 ${135+h%25} V180 H0z" fill="#000" opacity=".12"/>
+      <g transform="translate(${190+h%40} ${40+h%20}) scale(4)" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".95">${ICONS[it.categorie]||ICONS.jeux}</g></svg>`;
+  }
+  const PIN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>';
+  const WALK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="13" cy="4" r="2"/><path d="M10 21l2-6 3 3v3M8 12l3-4 3 2 3 3M11 8l-1 7"/></svg>';
+  const CAR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14v-5l-2-5H7l-2 5z"/><circle cx="8" cy="17" r="1.8"/><circle cx="16" cy="17" r="1.8"/></svg>';
+  function trips(it){
+    const t=it.trajet; if(!t) return "";
+    const row=(lab,x,prim)=> x ? `<div class="${prim?"primary":""}"><b>${lab}</b><span>${WALK}${x.pied!=null? x.pied+" min" : "trop loin"}</span><span>${CAR}${x.voiture} min</span><span>${x.km<1?Math.round(x.km*1000)+" m":x.km.toString().replace(".",",")+" km"}</span></div>` : "";
+    const a=row("Maison",t.maison,!isMer()), b=row("Ermont",t.ermont,isMer());
+    return `<div class="trips">${isMer()?b+a:a+b}</div>`;
+  }
+
+  const CLOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  const JK=["dim","lun","mar","mer","jeu","ven","sam"], JL={lun:"Lun",mar:"Mar",mer:"Mer",jeu:"Jeu",ven:"Ven",sam:"Sam",dim:"Dim"};
+  function hoursBlock(it, when){
+    const hs=it.horaires_semaine;
+    if(it.type!=="lieu" || !hs) return when ? `<div class="when">${CLOCK}<span>${esc(when)}</span></div>` : "";
+    const focus = new Set(slotDays().map(d=>JK[d.getDay()]));
+    const rows=["lun","mar","mer","jeu","ven","sam","dim"].map(k=>{ const v=hs[k]; const closed=v&&/ferm/i.test(v);
+      return `<tr class="${focus.has(k)?"today":""} ${closed?"closed":""}"><td>${JL[k]}</td><td>${esc(v||"Non communiqué")}</td></tr>`; }).join("");
+    const sum = slotDays().map(d=>{ const k=JK[d.getDay()]; return `${JL[k]} ${hs[k]||"?"}`; }).join(" · ") || "Voir la semaine";
+    return `<details class="hw"><summary><span class="when">${CLOCK}<span>${esc(sum)}</span></span></summary><table class="hours">${rows}</table>${hs.note?`<div class="hrs-note">${esc(hs.note)}</div>`:""}</details>`;
+  }
+  function moreBlock(it){
+    const D = it.details; if(!D || typeof D!=="object") return "";
+    const prog = Array.isArray(D.programme) ? D.programme.filter(x=>x && (x.heure||x.quoi)) : [];
+    const tar = Array.isArray(D.tarifs) ? D.tarifs.filter(Boolean) : [];
+    const inf = Array.isArray(D.infos) ? D.infos.filter(Boolean) : [];
+    if(!D.resume && !prog.length && !tar.length && !inf.length) return "";
+    const label = prog.length ? `Voir le programme (${prog.length} temps fort${prog.length>1?"s":""})` : "Plus de détails";
+    let host=""; try{ host = D.source ? new URL(D.source).hostname.replace(/^www\./,"") : ""; }catch(e){}
+    return `<details class="det"><summary><span>${esc(label)}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></summary><div class="det-in">
+      ${D.resume?`<p class="det-res">${esc(D.resume)}</p>`:""}
+      ${prog.length?`<div class="det-h">Programme</div><ol class="prog">${prog.map(x=>`<li><b>${esc(x.heure||"")}</b><span>${esc(x.quoi||"")}</span></li>`).join("")}</ol>`:""}
+      ${tar.length?`<div class="det-h">Tarifs</div><ul class="det-l">${tar.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
+      ${inf.length?`<div class="det-h">Bon à savoir</div><ul class="det-l">${inf.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:""}
+      ${host?`<a class="det-src" href="${esc(D.source)}" target="_blank" rel="noopener">Source : ${esc(host)}</a>`:""}
+    </div></details>`;
+  }
+  function card(it, withDate){
+    const cat = CATS[it.categorie] || CATS.jeux;
+    let tile="";
+    if(withDate && it.date_debut){
+      const d=parse(it.date_debut), e=parse(it.date_fin);
+      const multi = e && e>d;
+      tile = `<div class="tile"><span class="w">${multi?"dès le":DAYS[d.getDay()]}</span><span class="d">${d.getDate()}</span><span class="m">${MONTHS[d.getMonth()]}</span></div>`;
+    }
+    const photos = Array.isArray(it.photos) ? it.photos.filter(x=>x && x.url) : [];
+    const IM = it.image || {};
+    const TAGS = {officiel:"Visuel officiel", lieu:"Photo du lieu", illustration:"Photo d'illustration"};
+    const tg = IM.type || "illustration";
+    const credTxt = tg === "officiel" ? String(IM.credit||"").replace(/^Visuel officiel,\s*/,"") : (tg === "illustration" ? "pas le vrai lieu ni l'événement" : (IM.credit||""));
+    const fit = IM.w && IM.h && IM.w/IM.h < 1.45;
+    const main = IM.url ? [`<div class="slide${fit?" fit":""}">${fit?`<img class="bg" src="${esc(IM.url)}" alt="" aria-hidden="true" loading="lazy">`:""}<img class="fg" src="${esc(IM.url)}" alt="${esc(it.titre)}" loading="lazy"><a class="credit" href="${esc(IM.src||"#")}" target="_blank" rel="noopener"><b class="ptag ${tg}">${TAGS[tg]||TAGS.illustration}</b>${esc(credTxt)}</a></div>`] : [];
+    const slides = [...main, ...photos.map(ph=>`<div class="slide"><img src="${esc(ph.url)}" alt="${esc(it.titre)}" loading="lazy"></div>`)];
+    if(!slides.length) slides.push(`<div class="slide">${scene(it)}</div>`);
+    const dots = slides.length>1 ? `<div class="dots">${slides.map((_,i)=>`<i class="${i?"":"on"}"></i>`).join("")}</div>` : "";
+    const e=parse(it.date_fin), d=parse(it.date_debut);
+    const when = [ (withDate && e && d && e>d) ? "Jusqu'au "+fmtShort(e) : "", (isMer() && it.horaires_mercredi) ? it.horaires_mercredi : (it.horaires||"") ].filter(Boolean).join(" · ");
+    const fav = state.favs.has(it._id);
+    const adv = advice(it);
+    return `<article class="card" style="--c:var(${cat.c})">
+      <div class="media"><div class="slides" data-slides>${slides.join("")}</div>${dots}${tile}
+</div>
+      <div class="inner">
+        <span class="cat">${esc(cat.l)}</span>
+        <h3>${esc(it.titre)}</h3>
+        <div class="where">${esc([it.lieu, it.ville].filter(Boolean).join(", "))}</div>
+        ${hoursBlock(it, when)}
+        ${adv?`<div class="meteo-tip ${adv.k}">${wxSvg(adv.ic,20)}<span>${esc(adv.t)}</span></div>`:""}
+        ${it.description?`<p class="desc">${esc(it.description)}</p>`:""}
+        ${moreBlock(it)}
+        ${trips(it)}
+        <div class="tags">${tags(it)}</div>
+        <div class="links">${it.url?`<a class="more" href="${esc(it.url)}" target="_blank" rel="noopener">Voir les infos ›</a>`:""}${it.maps_url?`<a class="more" href="${esc(it.maps_url)}" target="_blank" rel="noopener">Google Maps, avis et photos ›</a>`:""}</div>
+      </div>
+      <button class="fav" type="button" data-fav="${esc(it._id)}" aria-pressed="${fav}" aria-label="${fav?"Retirer des favoris":"Ajouter aux favoris"}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></button>
+    </article>`;
+  }
+
+  // Ville prioritaire : Enghien-les-Bains le week-end, Ermont le mercredi
+  const homeTown = () => isMer() ? "Ermont" : "Enghien-les-Bains";
+  const inHome = it => (it.ville||"").toLowerCase().startsWith(homeTown().toLowerCase());
+  const byDist = (a,b)=>(dist(a)??99)-(dist(b)??99);
+  function townBlocks(list, renderInner){
+    const home=list.filter(inHome), other=list.filter(i=>!inHome(i));
+    const blk=(title,its,cls)=> its.length ? `<div class="town ${cls}"><h3 class="town-h">${esc(title)}<span>${its.length}</span></h3>${renderInner(its)}</div>` : "";
+    return blk("À "+homeTown(), home, "home") + blk("Dans les villes alentour", other, "around");
+  }
+
+  function renderAgenda(){
+    const ev = state.items.filter(i=>i.type==="evenement" && passes(i));
+    let list, dayGroups;
+    if(state.weekend===-1){
+      list = ev.filter(i=>(parse(i.date_fin)||parse(i.date_debut))>=today && (!isMer()||hasWed(i)));
+      dayGroups = its => { const by=new Map(); its.slice().sort((a,b)=>parse(a.date_debut)-parse(b.date_debut)).forEach(i=>{ let d=parse(i.date_debut); if(d<today) d=today; const k=MONTHS[d.getMonth()]+" "+d.getFullYear(); if(!by.has(k)) by.set(k,[]); by.get(k).push(i); });
+        return [...by].map(([k,v])=>({label:k.charAt(0).toUpperCase()+k.slice(1).replace(".",""), items:v.sort(byDist)})); };
+    } else {
+      const w = slots()[state.weekend];
+      list = ev.filter(i=>overlaps(i,w.sat,w.sun));
+      dayGroups = its => (isMer()?[w.sat]:[w.sat,w.sun]).map(day=>({label:DAYS_LONG[day.getDay()]+" "+fmtShort(day), items:its.filter(i=>overlaps(i,day,day)).sort(byDist)})).filter(g=>g.items.length);
+    }
+    $("agenda-count").textContent = list.length ? list.length+(list.length>1?" sorties":" sortie")+", du plus proche au plus loin" : "";
+    if(!state.ready){ $("agenda").innerHTML = '<div class="empty"><b>Les sorties arrivent…</b>Chargement de l\'agenda des villes autour d\'Enghien-les-Bains.</div>'; return; }
+    if(!list.length){
+      const quand = isMer() ? "ce mercredi" : "ce week-end";
+      const msg = state.items.length ? (state.filters.size||state.near ? `Rien avec ces filtres ${quand}. Retirez un filtre, ou piochez dans les valeurs sûres juste en dessous.` : `Pas d'événement repéré ${quand}. Les valeurs sûres juste en dessous restent ouvertes.`) : "L'agenda est vide pour l'instant. La prochaine recherche le remplira.";
+      $("agenda").innerHTML = `<div class="empty"><b>${isMer()?"Mercredi tranquille":"Week-end tranquille"}</b>${esc(msg)}</div>`; return;
+    }
+    $("agenda").innerHTML = townBlocks(list, its => dayGroups(its).map(g=>`<div class="day-label">${esc(g.label)}</div><div class="grid">${g.items.map(i=>card(i,true)).join("")}</div>`).join(""));
+  }
+
+  function renderLieux(){
+    const l = state.items.filter(i=>i.type==="lieu" && passes(i) && (!isMer() || i.ouvert_mercredi!==false)).sort(byDist);
+    $("h-lieux").textContent = isMer() ? "Les valeurs sûres, ouvertes le mercredi" : "Les valeurs sûres, tous les week-ends";
+    $("lieux-count").textContent = l.length ? l.length+" lieux, du plus proche au plus loin"+(isMer()?" d'Ermont":" de la maison") : "";
+    if(!state.ready){ $("lieux").innerHTML = '<div class="empty"><b>Chargement…</b>Parcs, fermes, piscines et coins au chaud.</div>'; return; }
+    if(!l.length){ $("lieux").innerHTML = `<div class="empty"><b>Aucun lieu avec ces filtres</b>Retirez un filtre pour revoir toute la liste.</div>`; return; }
+    $("lieux").innerHTML = townBlocks(l, its=>`<div class="grid">${its.map(i=>card(i,false)).join("")}</div>`);
+  }
+
+  function renderStamp(){
+    const m = state.meta;
+    if(!state.ready){ return; }
+    if(m && m.derniere_maj){
+      const d = new Date(m.derniere_maj);
+      $("stamp").textContent = "Mis à jour le "+d.getDate()+" "+MONTHS[d.getMonth()]+" à "+String(d.getHours()).padStart(2,"0")+"h"+String(d.getMinutes()).padStart(2,"0")+" · "+state.items.length+" idées";
+    } else $("stamp").textContent = state.items.length+" idées de sorties";
+  }
+
+  function render(){ renderWeekends(); renderWx(); renderChips(); renderFsum(); renderAgenda(); renderLieux(); renderStamp(); }
+
+  // Interactions
+  $("modes").addEventListener("click", e=>{ const b=e.target.closest("[data-mode]"); if(!b||b.dataset.mode===state.mode) return; state.mode=b.dataset.mode; state.weekend=0; try{localStorage.setItem("marius-mode", state.mode);}catch(_){} render(); });
+  $("weekends").addEventListener("click", e=>{ const b=e.target.closest("[data-wk]"); if(!b) return; state.weekend=Number(b.dataset.wk); render(); });
+  $("freset").addEventListener("click", ()=>{ state.filters.clear(); state.near=null; render(); });
+  $("near").addEventListener("click", e=>{ const b=e.target.closest("[data-near]"); if(!b) return; const k=b.dataset.near;
+    state.near = state.near===k ? null : k; render(); });
+  $("chips").addEventListener("click", e=>{ const b=e.target.closest("[data-f]"); if(!b) return; const f=b.dataset.f;
+    if(f.startsWith("cat:")) [...state.filters].filter(x=>x.startsWith("cat:")&&x!==f).forEach(x=>state.filters.delete(x));
+    state.filters.has(f)?state.filters.delete(f):state.filters.add(f); render(); });
+  document.addEventListener("click", e=>{ const b=e.target.closest("[data-fav]"); if(!b) return; const id=b.dataset.fav;
+    state.favs.has(id)?state.favs.delete(id):state.favs.add(id); try{localStorage.setItem("marius-favs", JSON.stringify([...state.favs]));}catch(_){} render(); });
+
+  document.addEventListener("scroll", e=>{ const sl=e.target; if(!(sl instanceof Element) || !sl.matches("[data-slides]")) return;
+    const i=Math.round(sl.scrollLeft/Math.max(1,sl.clientWidth)); sl.parentElement.querySelectorAll(".dots i").forEach((d,j)=>d.classList.toggle("on", j===i)); }, true);
+
+  let assets=null;
+  function canPhoto(){ return !!(assets && user && user.canEdit && user.canEdit()); }
+  const picker=document.createElement("input"); picker.type="file"; picker.accept="image/*"; picker.multiple=true; picker.hidden=true; picker.id="photo-picker"; document.body.appendChild(picker);
+  let photoFor=null;
+  document.addEventListener("click", e=>{ const b=e.target.closest("[data-addph]"); if(!b) return; photoFor=b.dataset.addph; picker.value=""; picker.click(); });
+  picker.addEventListener("change", async ()=>{
+    const files=[...picker.files]; if(!files.length||!photoFor||!assets||!db) return;
+    toast("Envoi de "+files.length+(files.length>1?" photos…":" photo…"));
+    try{
+      const ref=db.collection("activites").doc(photoFor); const cur=await ref.get();
+      const list = (cur.exists && Array.isArray(cur.data().photos)) ? cur.data().photos.slice() : [];
+      for(const f of files){ const r=await assets.upload(f); list.unshift({id:r.id, url:r.url}); }
+      await ref.update({photos:list}); toast("Photo ajoutée, toute la famille la voit.");
+    }catch(err){ toast("La photo n'a pas pu être ajoutée. Essayez une image plus légère."); }
+  });
+
+  render();
+
+  // Données partagées
+  let db=null;
+  async function load(){
+    if(!db) return;
+    try{
+      const [snap, meta] = await Promise.all([db.collection("activites").get(), db.doc("meta/etat").get()]);
+      apply(snap); state.meta = meta.exists ? meta.data() : null; state.ready=true; render(); maybeShowRelaunch();
+      return true;
+    }catch(e){ toast("Impossible de charger les sorties pour l'instant. Réessayez dans un moment."); return false; }
+  }
+  function apply(snap){
+    const now = today;
+    state.items = snap.docs.map(d=>Object.assign({_id:d.id}, d.data())).filter(i=>{
+      if(i.type!=="evenement") return true;
+      const end = parse(i.date_fin)||parse(i.date_debut); return end && end>=addDays(now,-1);
+    });
+  }
+
+  $("refresh").addEventListener("click", async ()=>{
+    const b=$("refresh"); b.disabled=true;
+    const ok = await load(); b.disabled=false;
+    if(ok) toast("Liste à jour.");
+  });
+
+  let mcp=null, user=null;
+  function maybeShowRelaunch(){
+    const id = state.meta && state.meta.trigger_id;
+    $("relaunch").hidden = !(mcp && id && user && user.isOwner());
+  }
+  $("relaunch").addEventListener("click", async ()=>{
+    const id = state.meta && state.meta.trigger_id; if(!mcp||!id) return;
+    const b=$("relaunch"); b.disabled=true;
+    try{
+      await mcp.callTool("Claude Code Remote","fire_trigger",{trigger_id:id});
+      toast("Recherche lancée. Comptez 10 à 20 minutes, puis touchez Rafraîchir.");
+    }catch(e){
+      toast(e && e.code==="denied" ? "Accès refusé au lancement de la recherche." : "La recherche n'a pas pu démarrer. Réessayez plus tard.");
+    }
+    b.disabled=false;
+  });
+
+  (async ()=>{
+    if(!window.claude || !window.claude.use){
+      // Version hébergée : données publiées en fichiers à côté de la page
+      try{
+        const get = p => fetch(p+"?v="+Date.now(), {cache:"no-store"}).then(r=>r.ok?r.json():null).catch(()=>null);
+        const [acts, met, eta] = await Promise.all([get("data/activites.json"), get("data/meteo.json"), get("data/etat.json")]);
+        if(acts){ apply({docs: acts.map(a=>({id:a._id, data:()=>a}))}); }
+        state.meteo = met; state.meta = eta; state.ready=true; render(); renderStamp();
+        const rb=$("refresh"); if(rb){ rb.onclick = ()=>location.reload(); }
+        if(!acts) $("stamp").textContent="Impossible de charger les sorties pour l'instant";
+      }catch(e){ state.ready=true; render(); }
+      return;
+    }
+    db = await window.claude.use("db");
+    if(!db){ state.ready=true; $("stamp").textContent="Connectez-vous à Claude pour voir les sorties"; render(); return; }
+    db.collection("activites").onSnapshot(s=>{ apply(s); state.ready=true; render(); }, ()=>{});
+    db.doc("meta/meteo").onSnapshot(s=>{ state.meteo = s.exists ? s.data() : null; render(); }, ()=>{});
+    db.doc("meta/etat").onSnapshot(s=>{ state.meta = s.exists ? s.data() : null; renderStamp(); maybeShowRelaunch(); }, ()=>{});
+    user = await window.claude.use("user");
+    mcp = await window.claude.use("mcp");
+    maybeShowRelaunch();
+    assets = await window.claude.use("assets");
+    if(canPhoto()) render();
+  })();
+})();
+</script>
