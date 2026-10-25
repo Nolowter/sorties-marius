@@ -133,6 +133,13 @@ main .wrap{padding-block:24px 56px; display:grid; gap:40px}
 .trips svg{width:15px; height:15px}
 .trips .primary b{color:var(--lake)}
 .links{display:flex; gap:14px; flex-wrap:wrap; margin-top:2px}
+.wxrow{display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:stretch}
+.favbtn{display:grid; justify-items:center; align-content:center; gap:3px; min-width:76px; padding:8px 10px; border-radius:16px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); font:inherit; font-size:.78rem; font-weight:700; cursor:pointer; line-height:1.15; text-align:center; position:relative}
+.favbtn svg{width:22px; height:22px; color:#e0475b; fill:none}
+.favbtn[aria-pressed="true"]{background:#e0475b; border-color:#e0475b; color:#fff}
+.favbtn[aria-pressed="true"] svg{color:#fff; fill:currentColor}
+.favbtn b{position:absolute; top:4px; right:6px; font-size:.66rem; background:#e0475b; color:#fff; border-radius:999px; padding:0 5px}
+.favbtn[aria-pressed="true"] b{background:#fff; color:#e0475b}
 .wx{display:flex; gap:8px; overflow-x:auto; scrollbar-width:none}
 .wxd{flex:0 0 auto; display:grid; gap:6px; background:var(--surface); border:1.5px solid var(--line); border-radius:16px; padding:8px 12px; font-size:.85rem}
 .wxh{display:flex; gap:8px; align-items:baseline; flex-wrap:wrap}
@@ -225,7 +232,7 @@ details.hw summary::-webkit-details-marker{display:none}
 <main>
   <div class="wrap">
     <div class="tools">
-      <div class="wx" id="wx" aria-label="Météo"></div>
+      <div class="wxrow"><div class="wx" id="wx" aria-label="Météo"></div><button class="favbtn" id="favbtn" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><span>Mes favoris</span><b id="favn"></b></button></div>
       <details class="filters" id="filters">
         <summary><span>Filtres</span><b id="fcount" hidden></b><small id="fsum"></small></summary>
         <div class="fbody">
@@ -342,11 +349,12 @@ details.hw summary::-webkit-details-marker{display:none}
   }
   function renderChips(){
     const present = new Set(state.items.map(i=>i.categorie));
-    const base = [["meteo","Idéal avec cette météo",null],["gratuit","Gratuit",null],["chaud","Au chaud",null],["favs","Mes favoris",null]];
+    const base = [["meteo","Idéal avec cette météo",null],["gratuit","Gratuit",null],["chaud","Au chaud",null]];
     const from = isMer() ? "d'Ermont" : "de la maison";
     const N=[["pied","À pied, 20 min max"],["v10","10 min en voiture"],["v20","20 min en voiture"]];
     $("near").innerHTML = `<span class="chips-lab">Près ${from}</span>` + N.map(([k,l])=>`<button class="chip" type="button" data-near="${k}" aria-pressed="${state.near===k}">${esc(l)}</button>`).join("");
     const cats = Object.keys(CATS).filter(k=>present.has(k)).map(k=>["cat:"+k, CATS[k].l, CATS[k].c]);
+    const fb=$("favbtn"); if(fb){ fb.setAttribute("aria-pressed", state.filters.has("favs")); const n=state.favs.size; $("favn").textContent=n||""; $("favn").hidden=!n; }
     $("chips").innerHTML = [...base, ...cats].map(([k,l,c])=>`<button class="chip" type="button" data-f="${k}" aria-pressed="${state.filters.has(k)}"${c?` style="--c:var(${c})"`:""}>${c?'<span class="dot"></span>':""}${esc(l)}</button>`).join("");
   }
 
@@ -573,6 +581,7 @@ details.hw summary::-webkit-details-marker{display:none}
   // Interactions
   $("modes").addEventListener("click", e=>{ const b=e.target.closest("[data-mode]"); if(!b||b.dataset.mode===state.mode) return; state.mode=b.dataset.mode; state.weekend=0; try{localStorage.setItem("marius-mode", state.mode);}catch(_){} render(); });
   $("weekends").addEventListener("click", e=>{ const b=e.target.closest("[data-wk]"); if(!b) return; state.weekend=Number(b.dataset.wk); render(); });
+  $("favbtn").addEventListener("click", ()=>{ state.filters.has("favs")?state.filters.delete("favs"):state.filters.add("favs"); render(); });
   $("freset").addEventListener("click", ()=>{ state.filters.clear(); state.near=null; render(); });
   $("near").addEventListener("click", e=>{ const b=e.target.closest("[data-near]"); if(!b) return; const k=b.dataset.near;
     state.near = state.near===k ? null : k; render(); });
